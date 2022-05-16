@@ -82,6 +82,33 @@ function add() {
   console.log('Added task: "' + task + '" with priority [' + priority + "]");
 }
 
+function listAllPending() {
+  let n = 0;
+  sort.stdout.on("data", function (data) {
+    const logger = fs.createWriteStream(PATH_TXT_TASK, {
+      flags: "w",
+    });
+
+    data
+      .toString()
+      .split("\n")
+      .forEach((record) => {
+        if (record.length != 0) {
+          n++;
+          logger.write(record + "\n");
+          console.info(
+            `${n}. ${record.slice(4, record.length)} ${record.slice(0, 3)}`
+          );
+        }
+      });
+  });
+  sort.on("exit", function (e) {
+    if (e) {
+      console.log("There are no pending tasks!");
+    }
+  });
+}
+
 function del() {
   let index = process.argv[3];
   let n = 0;
