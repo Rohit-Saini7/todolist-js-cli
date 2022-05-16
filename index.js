@@ -55,7 +55,7 @@ Usage :-
 # Show help.
 
 >./todolist report
-# Statistics.
+# Get report of complete and incomplete items.
 `);
 }
 
@@ -201,4 +201,41 @@ function del() {
       console.log("Deleted task with INDEX [" + index + "].");
     }
   });
+}
+
+function report() {
+  const file = readline.createInterface({
+    input: fs.createReadStream(PATH_TXT_TASK),
+    output: process.stdout,
+    terminal: false,
+  });
+  file.on("line", (record) => {
+    n++;
+    pending.push(record);
+  });
+  const file2 = readline.createInterface({
+    input: fs.createReadStream(PATH_TXT_COMPLETED),
+    output: process.stdout,
+    terminal: false,
+  });
+  file2.on("line", (line) => {
+    m++;
+    completed.push(line);
+  });
+
+  setTimeout(function () {
+    console.log("\nPending : " + n);
+    for (let i = 0; i < pending.length; i++) {
+      console.info(
+        `${i + 1}. ${pending[i].slice(4, pending[i].length)} ${pending[i].slice(
+          0,
+          3
+        )}`
+      );
+    }
+    console.log("\nCompleted : " + m);
+    for (let j = 0; j < completed.length; j++) {
+      console.info(`${j + 1}. ${completed[j].slice(4, completed[j].length)}`);
+    }
+  }, 15);
 }
