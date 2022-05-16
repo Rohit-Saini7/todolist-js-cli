@@ -81,3 +81,50 @@ function add() {
   logger.write("[" + priority + "]" + " " + task + "\n");
   console.log('Added task: "' + task + '" with priority [' + priority + "]");
 }
+
+function del() {
+  let index = process.argv[3];
+  let n = 0;
+
+  if (index == undefined || isNaN(index)) {
+    console.error("Error: Missing INDEX for deleting tasks.");
+    return;
+  } else if (index <= 0) {
+    console.error(
+      "Error: task with INDEX [0] does not exist, Nothing deleted."
+    );
+    return;
+  }
+
+  sort.stdout.on("data", function (data) {
+    const logger = fs.createWriteStream(PATH_TXT_TASK, {
+      flags: "w",
+    });
+    data
+      .toString()
+      .split("\n")
+      .forEach((record) => {
+        if (record) {
+          n++;
+          if (n == index) {
+          } else {
+            logger.write(record + "\n");
+          }
+        }
+      });
+  });
+  sort.on("exit", function (err) {
+    if (err) {
+      console.error(err);
+    }
+    if (n < index) {
+      console.error(
+        "Error: task with INDEX [" +
+          index +
+          "] does not exist, Nothing deleted."
+      );
+    } else {
+      console.log("Deleted task with INDEX [" + index + "].");
+    }
+  });
+}
