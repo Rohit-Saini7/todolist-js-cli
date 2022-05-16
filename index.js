@@ -109,6 +109,53 @@ function listAllPending() {
   });
 }
 
+function done() {
+  let index = process.argv[3];
+  let n = 0;
+  let taskCompleted = "a";
+
+  if (index == undefined || isNaN(index)) {
+    console.error("Error: Missing NUMBER for marking tasks as done.");
+    return;
+  } else if (index <= 0) {
+    console.error("Error: no incomplete item with index #0 exists.");
+    return;
+  }
+
+  sort.stdout.on("data", function (data) {
+    const logger = fs.createWriteStream(PATH_TXT_TASK, {
+      flags: "w",
+    });
+    data
+      .toString()
+      .split("\n")
+      .forEach((record) => {
+        if (record) {
+          n++;
+          if (n == index) {
+            taskCompleted = record;
+          } else {
+            logger.write(record + "\n");
+          }
+        }
+      });
+  });
+
+  sort.on("exit", function (e) {
+    if (e) {
+      console.log(e);
+    }
+    if (n < index) {
+      console.log("no incomplete item with INDEX [" + index + "] exists.");
+    } else {
+      fs.createWriteStream(PATH_TXT_COMPLETED, {
+        flags: "a",
+      }).write(taskCompleted + "\n");
+      console.log("Marked item as done.");
+    }
+  });
+}
+
 function del() {
   let index = process.argv[3];
   let n = 0;
